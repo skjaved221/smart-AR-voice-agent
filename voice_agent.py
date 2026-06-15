@@ -2,7 +2,7 @@ import asyncio
 import os
 from dotenv import load_dotenv
 from livekit.agents import JobContext, WorkerOptions, cli, llm
-from livekit.agents.voice_pipeline import VoicePipelineAgent
+from livekit.agents.pipeline import VoicePipelineAgent
 from livekit.plugins import deepgram, openai
 from database import get_invoice_details
 
