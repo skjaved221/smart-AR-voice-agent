@@ -92,4 +92,4 @@ async def entrypoint(ctx: JobContext):
 if __name__ == "__main__":
     # Start the LiveKit Agent worker process
     # The 'dev' or 'start' commands are passed via command-line args (e.g. python voice_agent.py dev)
-    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
+    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint, port=int(os.getenv("PORT", "8080"))))
