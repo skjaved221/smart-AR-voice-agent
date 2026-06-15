@@ -8,8 +8,12 @@ from database import get_invoice_details
 # Load API keys from .env file
 load_dotenv()
 
+# Map GEMINI_API_KEY to GOOGLE_API_KEY if needed (to support both naming conventions)
+if os.getenv("GEMINI_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+
 # Verify that credentials exist
-required_keys = ["GEMINI_API_KEY", "DEEPGRAM_API_KEY", "LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
+required_keys = ["GOOGLE_API_KEY", "DEEPGRAM_API_KEY", "LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
 missing_keys = [key for key in required_keys if not os.getenv(key)]
 if missing_keys:
     print(f"\n[WARNING] Missing environment variables: {', '.join(missing_keys)}")
@@ -60,13 +64,13 @@ async def entrypoint(ctx: JobContext):
     """
 
     # 3. Initialize the LiveKit 1.x AgentSession using Gemini & Deepgram
-    # STT: Deepgram (Speech-to-Text)
+    # STT: Deepgram (low latency speech recognition)
     # LLM: Google Gemini (Highly intelligent, low-latency, free-tier API)
     # TTS: Deepgram TTS (Real-time voice output using Deepgram credits)
     # VAD: Silero VAD (Voice Activity Detection)
     session = AgentSession(
         stt=deepgram.STT(),
-        llm=google.LLM(model="gemini-1.5-flash"),
+        llm=google.LLM(model="gemini-1.5-flash", api_key=os.getenv("GOOGLE_API_KEY")),
         tts=deepgram.TTS(),
         vad=silero.VAD.load()
     )
