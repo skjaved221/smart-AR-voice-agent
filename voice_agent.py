@@ -1,9 +1,8 @@
 import asyncio
 import os
 from dotenv import load_dotenv
-from livekit.agents import JobContext, WorkerOptions, cli, llm
-from livekit.agents.pipeline import VoicePipelineAgent
-from livekit.plugins import deepgram, openai
+from livekit.agents import JobContext, WorkerOptions, cli, llm, AgentSession, Agent
+from livekit.plugins import deepgram, openai, silero
 from database import get_invoice_details
 
 # Load API keys from .env file
@@ -60,28 +59,30 @@ async def entrypoint(ctx: JobContext):
     5. Always maintain a helpful, calm, and professional business tone.
     """
 
-    # 3. Initialize the LiveKit Voice Pipeline Agent
-    # VAD (Voice Activity Detection) is automatic from LiveKit SDK
-    # STT: Deepgram (very fast real-time transcription)
+    # 3. Initialize the LiveKit 1.x AgentSession
+    # STT: Deepgram (low latency speech recognition)
     # LLM: OpenAI GPT-4o-mini (highly intelligent and fast response)
     # TTS: OpenAI voice synthesis
-    agent = VoicePipelineAgent(
-        vad=ctx.vad,
+    # VAD: Silero VAD (Voice Activity Detection)
+    session = AgentSession(
         stt=deepgram.STT(),
         llm=openai.LLM(model="gpt-4o-mini"),
         tts=openai.TTS(),
-        chat_ctx=llm.ChatContext().append(role="system", text=system_prompt),
+        vad=silero.VAD.load()
     )
 
-    # 4. Start the agent worker in the WebRTC room
-    agent.start(ctx.room)
+    # 4. Start the session in the WebRTC room
+    await session.start(
+        room=ctx.room,
+        agent=Agent(instructions=system_prompt)
+    )
     
     # Send a warm intro greeting to the user as they join the call
-    await asyncio.sleep(1)  # small delay for connection stabilization
-    await agent.say(
+    await session.say(
         f"Hello, is this the finance department at {invoice['customer_name']}? "
         f"I am calling from Peakflo regarding invoice number I N V two zero two six zero zero one, "
-        f"which was due on June first."
+        f"which was due on June first.",
+        allow_interruptions=True
     )
 
 if __name__ == "__main__":
