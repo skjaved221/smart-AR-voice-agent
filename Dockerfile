@@ -20,7 +20,8 @@ COPY . .
 # Run database setup to initialize the SQLite DB inside the container
 RUN python database.py
 
-# Expose port (LiveKit agents HTTP server listens on port 8080 by default in prod)
+# Expose port and configure LiveKit agents to listen on 8080
+ENV PORT=8080
 EXPOSE 8080
 
 # Command to run the agent in start/production mode
