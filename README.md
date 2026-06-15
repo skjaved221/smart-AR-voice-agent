@@ -1,3 +1,12 @@
+---
+title: Smart AR Voice Agent
+emoji: 📞
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8080
+---
+
 # Smart Accounts Receivable (AR) Voice Agent
 
 This project implements a system that extracts financial details from invoice PDFs using OCR, stores them in a mock database, and launches a real-time LiveKit voice agent that calls the customer to follow up on overdue payments.
