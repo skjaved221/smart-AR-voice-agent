@@ -70,7 +70,7 @@ async def entrypoint(ctx: JobContext):
     # VAD: Silero VAD (Voice Activity Detection)
     session = AgentSession(
         stt=deepgram.STT(),
-        llm=google.LLM(model="gemini-1.5-flash", api_key=os.getenv("GOOGLE_API_KEY")),
+        llm=google.LLM(model="gemini-2.5-flash", api_key=os.getenv("GOOGLE_API_KEY")),
         tts=deepgram.TTS(),
         vad=silero.VAD.load()
     )
