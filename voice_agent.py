@@ -2,14 +2,14 @@ import asyncio
 import os
 from dotenv import load_dotenv
 from livekit.agents import JobContext, WorkerOptions, cli, llm, AgentSession, Agent
-from livekit.plugins import deepgram, openai, silero
+from livekit.plugins import deepgram, google, silero
 from database import get_invoice_details
 
 # Load API keys from .env file
 load_dotenv()
 
 # Verify that credentials exist
-required_keys = ["OPENAI_API_KEY", "DEEPGRAM_API_KEY", "LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
+required_keys = ["GEMINI_API_KEY", "DEEPGRAM_API_KEY", "LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
 missing_keys = [key for key in required_keys if not os.getenv(key)]
 if missing_keys:
     print(f"\n[WARNING] Missing environment variables: {', '.join(missing_keys)}")
@@ -59,15 +59,15 @@ async def entrypoint(ctx: JobContext):
     5. Always maintain a helpful, calm, and professional business tone.
     """
 
-    # 3. Initialize the LiveKit 1.x AgentSession
-    # STT: Deepgram (low latency speech recognition)
-    # LLM: OpenAI GPT-4o-mini (highly intelligent and fast response)
-    # TTS: OpenAI voice synthesis
+    # 3. Initialize the LiveKit 1.x AgentSession using Gemini & Deepgram
+    # STT: Deepgram (Speech-to-Text)
+    # LLM: Google Gemini (Highly intelligent, low-latency, free-tier API)
+    # TTS: Deepgram TTS (Real-time voice output using Deepgram credits)
     # VAD: Silero VAD (Voice Activity Detection)
     session = AgentSession(
         stt=deepgram.STT(),
-        llm=openai.LLM(model="gpt-4o-mini"),
-        tts=openai.TTS(),
+        llm=google.LLM(model="gemini-1.5-flash"),
+        tts=deepgram.TTS(),
         vad=silero.VAD.load()
     )
 
