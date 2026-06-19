@@ -1,111 +1,106 @@
----
-title: Smart AR Voice Agent
-emoji: 📞
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 8080
----
+# Smart Accounts Receivable (AR) Voice Agent
 
-# 📞 Smart Accounts Receivable (AR) Voice Agent
+An AI-powered voice agent for automated accounts receivable collections. It extracts invoice data, stores invoice state in SQLite, and uses LiveKit + Gemini + Deepgram for a realtime voice workflow.
 
-> India's first AI-powered voice agent for automated accounts receivable (AR) collections. Built for high-agency, low-latency, and production-grade performance.
+## What this project demonstrates
 
-[![GitHub license](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Built with LiveKit](https://img.shields.io/badge/Built%20with-LiveKit-red?style=for-the-badge&logo=livekit)](https://livekit.io)
-[![LLM: Gemini 2.5](https://img.shields.io/badge/LLM-Gemini%202.5--Flash-orange?style=for-the-badge&logo=googlegemini)](https://aistudio.google.com)
-[![TTS/STT: Deepgram](https://img.shields.io/badge/Audio-Deepgram-green?style=for-the-badge)](https://deepgram.com)
-[![Host: Hugging Face Spaces](https://img.shields.io/badge/Host-Hugging%20Face%20Spaces-yellow?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/sheikhjaved/smart-AR-voice-agent)
+- LiveKit Agents worker for WebRTC voice conversations
+- Gemini LLM reasoning through the LiveKit Google plugin
+- Deepgram STT/TTS for speech input and output
+- Silero VAD for interruption-friendly turn handling
+- EasyOCR + pdf2image invoice OCR pipeline
+- SQLite persistence for invoice status and promised payment dates
+- Docker-ready deployment
 
----
-
-## 🚀 Live Demo & Pitch
-Instead of observer dashboards, this project is a fully autonomous **agentic workflow**. It extracts overdue invoice details using OCR, syncs them to a stateful database, and triggers a real-time, WebRTC-based phone-style voice call to negotiate payments with customers.
-
-*   **Watch the 2-minute walkthrough & live call demo:**  
-    [![Watch the Demo](https://img.shields.io/badge/Demo-Watch%20Loom%20Video-blue?style=for-the-badge&logo=loom&logoColor=white)](YOUR_LOOM_VIDEO_URL_HERE)
-
----
-
-## 🛠️ System Architecture
-
-The pipeline consists of three core engineering blocks, designed for maximum efficiency and sub-second voice latency:
+## Architecture
 
 ```mermaid
 graph TD
-    A[Invoice PDF] -->|Step 1: EasyOCR| B(Structured Invoices)
-    B -->|Step 2: sqlite3| C[(SQLite Local DB)]
-    C -->|Lookup details| D[LiveKit AgentSession]
-    D -->|Step 3: WebRTC| E[STT: Deepgram Nova-3]
-    D -->|Step 4: LLM| F[Gemini 2.5 Flash]
-    D -->|Step 5: TTS| G[TTS: Deepgram Aura-2]
-    G -->|Voice Stream| H(Customer Browser/Phone)
+    A[Invoice PDF] -->|EasyOCR + pdf2image| B[Structured invoice fields]
+    B -->|upsert_invoice| C[(SQLite DB)]
+    C -->|get_invoice_details| D[LiveKit AgentSession]
+    D -->|STT| E[Deepgram Nova-3]
+    D -->|LLM| F[Gemini 2.5 Flash]
+    D -->|TTS| G[Deepgram Aura]
+    D -->|Tool call| H[record_payment_promise]
+    H --> C
 ```
 
----
+## Setup
 
-## ✨ Features & Technical Highlights
+### 1. Install system dependency
 
-*   **📄 High-Fidelity OCR Ingestion:** Uses `pdf2image` and `EasyOCR` to convert documents on-the-fly and run regex heuristics to extract Invoice IDs, Customer Names, Due Dates, and Balances.
-*   **💾 Stateful Business Logic:** Uses a localized `SQLite` database to fetch live invoice data, ensure the agent has accurate financial context, and record payment promise dates.
-*   **⚡ Sub-Second Audio Latency:** Orchestrated using **LiveKit Agents 1.6.0** WebRTC infrastructure, Deepgram STT, and Deepgram Aura TTS, dropping latency under 800ms.
-*   **🗣️ Advanced Interruption Handling:** Employs `Silero VAD` (Voice Activity Detection) inside the pipeline, allowing the customer to talk over the agent naturally.
-*   **🎯 Phonetic TTS Formatting:** Contextual prompts instruct the LLM to write numbers and codes phonetically (e.g. spelling out `"I N V two zero..."` and speaking `"four thousand dollars"` instead of symbols) to eliminate voice synthesis errors.
-*   **🐳 Containerized & Cloud-Ready:** Deployed 24/7 on **Hugging Face Spaces** using a custom `Dockerfile` containing all dependencies (including Poppler system binaries).
+The OCR pipeline needs Poppler.
 
----
+- Windows: install Poppler and add the `bin` folder to PATH
+- macOS: `brew install poppler`
+- Linux: `sudo apt-get install poppler-utils`
 
-## 📂 Project Directory Structure
+### 2. Install Python dependencies
 
-```text
-smart-AR-voice-agent/
-│
-├── C:\Users\skjav\.gemini\antigravity\scratch\smart_ar_voice_agent\
-│   ├── voice_agent.py        # LiveKit 1.x WebRTC Agent & session orchestrator
-│   ├── ocr_extractor.py      # EasyOCR document parsing script
-│   ├── database.py           # SQLite db manager & invoice seeding
-│   ├── Dockerfile            # Container config for 24/7 production hosting
-│   ├── requirements.txt      # Python dependencies
-│   ├── README.md             # Hugging Face Spaces configurations & Documentation
-│   └── .gitignore            # Security filter for database & API keys
-```
-
----
-
-## 💻 Local Quickstart
-
-### 1. Install System Dependencies
-The PDF-to-Image OCR pipeline requires **Poppler**:
-*   **Windows:** Download binaries from [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases), extract, and add the `bin` folder to your System PATH variables.
-*   **Mac:** `brew install poppler`
-*   **Linux:** `sudo apt-get install poppler-utils`
-
-### 2. Set Up the Project
 ```bash
-# Clone the repository
-git clone https://github.com/skjaved221/smart-AR-voice-agent.git
-cd smart-AR-voice-agent
-
-# Install python libraries
+python -m venv .venv
+.venv\Scripts\activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-### 3. Configure API Credentials
-Create a `.env` file in the root folder and add your credentials:
+### 3. Configure environment
+
+```bash
+copy .env.example .env  # Windows
+# or
+cp .env.example .env    # macOS/Linux
+```
+
+Fill in:
+
 ```env
-LIVEKIT_URL=wss://your-project.livekit.cloud
+LIVEKIT_URL=wss://your-project-id.livekit.cloud
 LIVEKIT_API_KEY=APIxxxxxxxxx
 LIVEKIT_API_SECRET=secxxxxxxxxx
-GOOGLE_API_KEY=AIzaSyxxxxxxxxxxxxx
-DEEPGRAM_API_KEY=xxxxxxxxxxxxxxxxx
+GOOGLE_API_KEY=AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DEEPGRAM_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### 4. Initialize Database & Run Agent
-```bash
-# Set up and seed the local SQL database
-python database.py
+### 4. Initialize database
 
-# Launch the agent worker
+```bash
+python database.py
+```
+
+### 5. Run locally
+
+```bash
 python voice_agent.py dev
 ```
-Open the [LiveKit Sandbox](https://meet.livekit.io/), connect using your credentials, and start talking to the agent!
+
+Then connect from a LiveKit room/client and speak to the agent.
+
+## OCR usage
+
+Place an invoice PDF in the project folder and run:
+
+```bash
+python ocr_extractor.py
+```
+
+For app integration, call:
+
+```python
+from database import upsert_invoice
+from ocr_extractor import extract_invoice_data
+
+invoice = extract_invoice_data("invoice_sample.pdf")
+upsert_invoice({**invoice, "status": "OVERDUE"})
+```
+
+## Main fixes in this version
+
+- Restored proper newlines/formatting in every source/config file
+- Fixed invalid `requirements.txt`, `.env.example`, `.gitignore`, and `Dockerfile`
+- Added DB auto-initialization and safe schema migration
+- Added promise-date persistence
+- Replaced hard-coded invoice details in the voice prompt with database values
+- Added TTS-safe formatting for invoice IDs and money amounts
+- Added a LiveKit function tool for recording payment promises
+- Made OCR parsing testable without running EasyOCR
