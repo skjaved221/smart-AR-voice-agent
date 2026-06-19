@@ -41,12 +41,12 @@ graph TD
 
 ##  Features & Technical Highlights
 
-*   **High-Fidelity OCR Ingestion:** Uses `pdf2image` and `EasyOCR` to convert documents on-the-fly and run regex heuristics to extract Invoice IDs, Customer Names, Due Dates, and Balances.
-*   ** Stateful Business Logic:** Uses a localized `SQLite` database to fetch live invoice data, ensure the agent has accurate financial context, and record payment promise dates.
-*   ** Sub-Second Audio Latency:** Orchestrated using **LiveKit Agents 1.6.0** WebRTC infrastructure, Deepgram STT, and Deepgram Aura TTS, dropping latency under 800ms.
-*   ** Advanced Interruption Handling:** Employs `Silero VAD` (Voice Activity Detection) inside the pipeline, allowing the customer to talk over the agent naturally.
-*   ** Phonetic TTS Formatting:** Contextual prompts instruct the LLM to write numbers and codes phonetically (e.g. spelling out `"I N V two zero..."` and speaking `"four thousand dollars"` instead of symbols) to eliminate voice synthesis errors.
-*   ** Containerized & Cloud-Ready:** Deployed 24/7 on **Hugging Face Spaces** using a custom `Dockerfile` containing all dependencies (including Poppler system binaries).
+*   High-Fidelity OCR Ingestion: Uses `pdf2image` and `EasyOCR` to convert documents on-the-fly and run regex heuristics to extract Invoice IDs, Customer Names, Due Dates, and Balances.
+*    Stateful Business Logic: Uses a localized `SQLite` database to fetch live invoice data, ensure the agent has accurate financial context, and record payment promise dates.
+*    Sub-Second Audio Latency: Orchestrated using **LiveKit Agents 1.6.0** WebRTC infrastructure, Deepgram STT, and Deepgram Aura TTS, dropping latency under 800ms.
+*    Advanced Interruption Handling: Employs `Silero VAD` (Voice Activity Detection) inside the pipeline, allowing the customer to talk over the agent naturally.
+*    Phonetic TTS Formatting: Contextual prompts instruct the LLM to write numbers and codes phonetically (e.g. spelling out `"I N V two zero..."` and speaking `"four thousand dollars"` instead of symbols) to eliminate voice synthesis errors.
+*    Containerized & Cloud-Ready: Deployed 24/7 on **Hugging Face Spaces** using a custom `Dockerfile` containing all dependencies (including Poppler system binaries).
 
 - Windows: install Poppler and add the `bin` folder to PATH
 - macOS: `brew install poppler`
@@ -66,7 +66,7 @@ pip install -r requirements.txt
 
 ### 1. Install System Dependencies
 The PDF-to-Image OCR pipeline requires **Poppler**:
-*   **Windows:** Download binaries from [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases), extract, and add the `bin` folder to your System PATH variables.
+*   Windows: Download binaries from [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases), extract, and add the `bin` folder to your System PATH variables.
 *   **Mac:** `brew install poppler`
 *   **Linux:** `sudo apt-get install poppler-utils`
 
