@@ -1,22 +1,23 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.mypy_cache/
 
-# Database
+# Local database and generated files
 *.db
 *.sqlite3
+temp_invoice_page.jpg
+invoice_sample.pdf
 
-# Environments
+# Environments and secrets
 .env
-.venv
-env/
+.venv/
 venv/
+env/
 ENV/
-env.bak/
-venv.bak/
 
 # System files
 .DS_Store
 Thumbs.db
-temp_invoice_page.jpg

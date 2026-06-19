@@ -1,8 +1,4 @@
-livekit-agents>=1.6.0
-livekit-plugins-openai>=1.6.0
-livekit-plugins-deepgram>=1.6.0
-livekit-plugins-silero>=1.6.0
-livekit-plugins-google>=1.6.0
+livekit-agents[deepgram,google,silero]~=1.6
+python-dotenv>=1.0.1
 easyocr>=1.7.1
 pdf2image>=1.17.0
-python-dotenv>=1.0.1
