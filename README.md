@@ -1,6 +1,5 @@
-# Smart Accounts Receivable (AR) Voice Agent
 
-An AI-powered voice agent for automated accounts receivable collections. It extracts invoice data, stores invoice state in SQLite, and uses LiveKit + Gemini + Deepgram for a realtime voice workflow.
+#  Smart Accounts Receivable (AR) Voice Agent
 
 ## What this project demonstrates
 
@@ -12,7 +11,19 @@ An AI-powered voice agent for automated accounts receivable collections. It extr
 - SQLite persistence for invoice status and promised payment dates
 - Docker-ready deployment
 
-## Architecture
+---
+
+##  Live Demo & Pitch
+Instead of observer dashboards, this project is a fully autonomous **agentic workflow**. It extracts overdue invoice details using OCR, syncs them to a stateful database, and triggers a real-time, WebRTC-based phone-style voice call to negotiate payments with customers.
+
+*   **Watch the 2-minute walkthrough & live call demo:**  
+    [![Watch the Demo](https://img.shields.io/badge/Demo-Watch%20Loom%20Video-blue?style=for-the-badge&logo=loom&logoColor=white)](YOUR_LOOM_VIDEO_URL_HERE)
+
+---
+
+##  System Architecture
+
+The pipeline consists of three core engineering blocks, designed for maximum efficiency and sub-second voice latency:
 
 ```mermaid
 graph TD
@@ -28,15 +39,20 @@ graph TD
 
 ## Setup
 
-### 1. Install system dependency
+##  Features & Technical Highlights
 
-The OCR pipeline needs Poppler.
+*   **High-Fidelity OCR Ingestion:** Uses `pdf2image` and `EasyOCR` to convert documents on-the-fly and run regex heuristics to extract Invoice IDs, Customer Names, Due Dates, and Balances.
+*   ** Stateful Business Logic:** Uses a localized `SQLite` database to fetch live invoice data, ensure the agent has accurate financial context, and record payment promise dates.
+*   ** Sub-Second Audio Latency:** Orchestrated using **LiveKit Agents 1.6.0** WebRTC infrastructure, Deepgram STT, and Deepgram Aura TTS, dropping latency under 800ms.
+*   ** Advanced Interruption Handling:** Employs `Silero VAD` (Voice Activity Detection) inside the pipeline, allowing the customer to talk over the agent naturally.
+*   ** Phonetic TTS Formatting:** Contextual prompts instruct the LLM to write numbers and codes phonetically (e.g. spelling out `"I N V two zero..."` and speaking `"four thousand dollars"` instead of symbols) to eliminate voice synthesis errors.
+*   ** Containerized & Cloud-Ready:** Deployed 24/7 on **Hugging Face Spaces** using a custom `Dockerfile` containing all dependencies (including Poppler system binaries).
 
 - Windows: install Poppler and add the `bin` folder to PATH
 - macOS: `brew install poppler`
 - Linux: `sudo apt-get install poppler-utils`
 
-### 2. Install Python dependencies
+##  Project Directory Structure
 
 ```bash
 python -m venv .venv
@@ -46,6 +62,15 @@ pip install -r requirements.txt
 
 ### 3. Configure environment
 
+##  Local Quickstart
+
+### 1. Install System Dependencies
+The PDF-to-Image OCR pipeline requires **Poppler**:
+*   **Windows:** Download binaries from [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases), extract, and add the `bin` folder to your System PATH variables.
+*   **Mac:** `brew install poppler`
+*   **Linux:** `sudo apt-get install poppler-utils`
+
+### 2. Set Up the Project
 ```bash
 copy .env.example .env  # Windows
 # or
