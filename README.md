@@ -1,4 +1,12 @@
-
+---
+title: Smart AR Voice Agent
+emoji: 🎙️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
 #  Smart Accounts Receivable (AR) Voice Agent
 
 ## What this project demonstrates
